@@ -74,15 +74,16 @@ $IdC[48] = "2 BÍCH"
 $IdC[49] = "2 CHUỒN"
 $IdC[50] = "2 RÔ"
 $IdC[51] = "2 CƠ"
+;Opt("GUIOnEventMode", 1)
 Global 	$GUIMsg, $GUI, $position1[4], $position2[4], $GUIRESULT1, $GUIRESULT2
 Global 	$height = 420, $Random10, $Random5
 $GUI 		= GUICreate("Go Win", 130, 270, -1, -1, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
-$start1 		= GUICtrlCreateButton("START 1", 4, 4, 60, 41, 0x0001)
-$start2 		= GUICtrlCreateButton("START 2", 64, 4, 60, 41, 0x0001)
+$start1 	= GUICtrlCreateButton("START 1", 4, 4, 60, 41, 0x0001)
+$start2 	= GUICtrlCreateButton("START 2", 64, 4, 60, 41, 0x0001)
 
 Global $tolerance = GUICtrlCreateInput("130", 4, 48, 120, 20, $ES_NUMBER)
 Global $margin_top1 = GUICtrlCreateInput("460", 4, 70, 60, 20, $ES_NUMBER)
-Global $margin_top2 = GUICtrlCreateInput("1024", 64, 70, 60, 20, $ES_NUMBER)
+Global $margin_top2 = GUICtrlCreateInput("222", 64, 70, 60, 20, $ES_NUMBER)
 $idListview = GUICtrlCreateListView(" Name | #", 4, 102, 120, 103)
 For $i = 0 To UBound($IdC)-1
 	If $i < 9 Then
@@ -249,126 +250,148 @@ EndFunc
 
 Func _ShowImg_1($array, $time)
 	Local $total = UBound($array), $margin_top
-	Local $default, $w = 10, $nMsgShow1, $showPic1[$total]
+	Local $default, $w = 10
+	Dim $showPic1[$total]
 	$w = $total * 102
 	$default = $w
 	$margin_top = GUICtrlRead($margin_top1)
 	$GUIRESULT1 = GUICreate("#1: KẾT QUẢ: " & $total & " CON BÀI, THỜI GIAN: " & Round($time/1000) & " GIÂY.", $w + 10, 152, 1, $margin_top, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
+	;$GUIRESULT1 = GUICreate("#1:THỜI GIAN: " & Round($time/1000) & " GIÂY.", $w + 10, 152, 1, $margin_top, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
 	$w = 10
 	For $i = 0 To $total - 1
 		$showPic1[$i] = GUICtrlCreatePic(@scriptdir&"\img\full\" & $array[$i] &".jpg", $w, 5, 102, 145)
+		;$showPic1[$i] = GUICtrlCreatePic(@scriptdir&"/111.jpg", $w, 5, 102, 145)
 		$w = $w + 102
 	Next
 	GUISetState(@SW_SHOW,$GUIRESULT1)
 	Winactivate($GUIRESULT1)
+	Local $nMsgShow = 0
 	While 1
-        $nMsgShow1 = GUIGetMsg()
-        Switch $nMsgShow1
-			Case $GUI_EVENT_CLOSE
-                GUIDelete($GUIRESULT1)
-                ExitLoop
-			Case $start1
-				If $position1[0] <> "" Or $position1[1] <> "" Or $position1[2] <> "" Or $position1[3] <> "" Then
-					_Start_1()
-				Else
-					GUISetState(@SW_HIDE,$GUI)
-					$position1	= GetPosition()
-					_Start_1()
-				EndIf
-			Case $start2
-				If $position2[0] <> "" Or $position2[1] <> "" Or $position2[2] <> "" Or $position2[3] <> "" Then
-					_Start_2()
-				Else
-					GUISetState(@SW_HIDE,$GUI)
-					$position2	= GetPosition()
-					_Start_2()
-				EndIf
-			Case $screenshot
-				$aItem = _GUICtrlListView_GetItemTextArray($idListview)
-				GUISetState(@SW_HIDE,$GUI)
-				_Capture($aItem[2])
-				GUISetState(@SW_SHOW,$GUI)
-			Case $reset
-					$position1[0] = ""
-					$position1[1] = ""
-					$position1[2] = ""
-					$position1[3] = ""
-					$position2[0] = ""
-					$position2[1] = ""
-					$position2[2] = ""
-					$position2[3] = ""
-			Case $showPic1[0] To $showPic1[$total - 1]
-				For $i = 0 To $total - 1
-					If $nMsgShow1 = $showPic1[$i] Then
-						GUICtrlDelete($showPic1[$i])
-						_ArrayDelete($array, $i)
-					EndIf
-				Next
-			Case $resize
-				Resize()
+        $nMsgShow = GUIGetMsg(1)
+        Switch $nMsgShow[1]
+			Case $GUI
+				Switch $nMsgShow[0]
+					Case $start1
+						If $position1[0] <> "" Or $position1[1] <> "" Or $position1[2] <> "" Or $position1[3] <> "" Then
+							_Start_1()
+						Else
+							GUISetState(@SW_HIDE,$GUI)
+							$position1	= GetPosition()
+							_Start_1()
+						EndIf
+					Case $start2
+						If $position2[0] <> "" Or $position2[1] <> "" Or $position2[2] <> "" Or $position2[3] <> "" Then
+							_Start_2()
+						Else
+							GUISetState(@SW_HIDE,$GUI)
+							$position2	= GetPosition()
+							_Start_2()
+						EndIf
+					Case $screenshot
+						$aItem = _GUICtrlListView_GetItemTextArray($idListview)
+						GUISetState(@SW_HIDE,$GUI)
+						_Capture($aItem[2])
+						GUISetState(@SW_SHOW,$GUI)
+					Case $reset
+						$position1[0] = ""
+						$position1[1] = ""
+						$position1[2] = ""
+						$position1[3] = ""
+						$position2[0] = ""
+						$position2[1] = ""
+						$position2[2] = ""
+						$position2[3] = ""
+					Case $resize
+						Resize()
+				EndSwitch
+			Case $GUIRESULT1
+				Switch $nMsgShow[0]
+					Case $GUI_EVENT_CLOSE
+						GUIDelete($GUIRESULT1)
+						ExitLoop
+					Case $showPic1[0] To $showPic1[$total - 1]
+						For $i = 0 To $total - 1
+							If $nMsgShow[0] = $showPic1[$i] Then
+								GUICtrlDelete($showPic1[$i])
+								_ArrayDelete($array, $i)
+							EndIf
+						Next
+				EndSwitch
         EndSwitch
     WEnd
 EndFunc
 
 Func _ShowImg_2($array, $time)
 	Local $total = UBound($array), $margin_top
-	Local $default, $w = 10, $nMsgShow2, $showPic2[$total]
+	Local $default, $w = 10, $showPic2[$total]
 	$w = $total * 102
 	$default = $w
 	$margin_top = GUICtrlRead($margin_top2)
-	$GUIRESULT1 = GUICreate("#2: KẾT QUẢ: " & $total & " CON BÀI, THỜI GIAN: " & Round($time/1000) & " GIÂY.", $w + 10, 152, 1, $margin_top, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
+	$GUIRESULT2 = GUICreate("#2: KẾT QUẢ: " & $total & " CON BÀI, THỜI GIAN: " & Round($time/1000) & " GIÂY.", $w + 10, 152, 1, $margin_top, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
+	;$GUIRESULT2 = GUICreate("#2, THỜI GIAN: " & Round($time/1000) & " GIÂY.", $w + 10, 152, 1, $margin_top, BitXOR($GUI_SS_DEFAULT_GUI, $WS_MINIMIZEBOX))
 	$w = 10
 	For $i = 0 To $total - 1
 		$showPic2[$i] = GUICtrlCreatePic(@scriptdir&"\img\full\" & $array[$i] &".jpg", $w, 5, 102, 145)
+		;$showPic2[$i] = GUICtrlCreatePic(@scriptdir&"/111.jpg", $w, 5, 102, 145)
 		$w = $w + 102
 	Next
 	GUISetState(@SW_SHOW,$GUIRESULT2)
 	Winactivate($GUIRESULT2)
+	Local $nMsgShow = 0
 	While 1
-        $nMsgShow2 = GUIGetMsg()
-        Switch $nMsgShow2
-			Case $GUI_EVENT_CLOSE
-				GUIDelete($GUIRESULT2)
-                ExitLoop
-			Case $start1
-				If $position1[0] <> "" Or $position1[1] <> "" Or $position1[2] <> "" Or $position1[3] <> "" Then
-					_Start_1()
-				Else
-					GUISetState(@SW_HIDE,$GUI)
-					$position1	= GetPosition()
-					_Start_1()
-				EndIf
-			Case $start2
-				If $position2[0] <> "" Or $position2[1] <> "" Or $position2[2] <> "" Or $position2[3] <> "" Then
-					_Start_2()
-				Else
-					GUISetState(@SW_HIDE,$GUI)
-					$position2	= GetPosition()
-					_Start_2()
-				EndIf
-			Case $screenshot
-				$aItem = _GUICtrlListView_GetItemTextArray($idListview)
-				GUISetState(@SW_HIDE,$GUI)
-				_Capture($aItem[2])
-				GUISetState(@SW_SHOW,$GUI)
-			Case $reset
-					$position1[0] = ""
-					$position1[1] = ""
-					$position1[2] = ""
-					$position1[3] = ""
-					$position2[0] = ""
-					$position2[1] = ""
-					$position2[2] = ""
-					$position2[3] = ""
-			Case $showPic2[0] To $showPic2[$total - 1]
-				For $i = 0 To $total - 1
-					If $nMsgShow2 = $showPic2[$i] Then
-						GUICtrlDelete($showPic2[$i])
-						_ArrayDelete($array, $i)
-					EndIf
-				Next
-			Case $resize
-				Resize()
+        $nMsgShow = GUIGetMsg(1)
+        Switch $nMsgShow[1]
+			Case $GUI
+				Switch $nMsgShow[0]
+					Case $GUI_EVENT_CLOSE
+						GUICtrlDelete($GUI)
+						Exit
+					Case $start1
+						If $position1[0] <> "" Or $position1[1] <> "" Or $position1[2] <> "" Or $position1[3] <> "" Then
+							_Start_1()
+						Else
+							GUISetState(@SW_HIDE,$GUI)
+							$position1	= GetPosition()
+							_Start_1()
+						EndIf
+					Case $start2
+						If $position2[0] <> "" Or $position2[1] <> "" Or $position2[2] <> "" Or $position2[3] <> "" Then
+							_Start_2()
+						Else
+							GUISetState(@SW_HIDE,$GUI)
+							$position2	= GetPosition()
+							_Start_2()
+						EndIf
+					Case $screenshot
+						$aItem = _GUICtrlListView_GetItemTextArray($idListview)
+						GUISetState(@SW_HIDE,$GUI)
+						_Capture($aItem[2])
+						GUISetState(@SW_SHOW,$GUI)
+					Case $reset
+						$position1[0] = ""
+						$position1[1] = ""
+						$position1[2] = ""
+						$position1[3] = ""
+						$position2[0] = ""
+						$position2[1] = ""
+						$position2[2] = ""
+						$position2[3] = ""
+					Case $resize
+						Resize()
+				EndSwitch
+			Case $GUIRESULT2
+				Switch $nMsgShow[0]
+					Case $GUI_EVENT_CLOSE
+						GUIDelete($GUIRESULT2)
+						ExitLoop
+					Case $showPic2[0] To $showPic2[$total - 1]
+						For $i = 0 To $total - 1
+							If $nMsgShow[0] = $showPic2[$i] Then
+								GUICtrlDelete($showPic2[$i])
+								_ArrayDelete($array, $i)
+							EndIf
+						Next
+				EndSwitch
         EndSwitch
     WEnd
 EndFunc
